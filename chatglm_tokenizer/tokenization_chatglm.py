@@ -1,10 +1,11 @@
 import os
+from typing import Dict, List, Optional, Union
+
 import torch
-from typing import List, Optional, Union, Dict
 from sentencepiece import SentencePieceProcessor
 from transformers import PreTrainedTokenizer
-from transformers.utils import logging, PaddingStrategy
-from transformers.tokenization_utils_base import EncodedInput, BatchEncoding
+from transformers.tokenization_utils_base import BatchEncoding, EncodedInput
+from transformers.utils import PaddingStrategy, logging
 
 
 class SPTokenizer:
@@ -48,7 +49,7 @@ class SPTokenizer:
         return text
 
     def convert_token_to_id(self, token):
-        """ Converts a token (str) in an id using the vocab. """
+        """Converts a token (str) in an id using the vocab."""
         if token in self.special_tokens:
             return self.special_tokens[token]
         return self.sp_model.PieceToId(token)
@@ -74,7 +75,7 @@ class ChatGLMTokenizer(PreTrainedTokenizer):
         self.special_tokens = {
             "<bos>": self.tokenizer.bos_id,
             "<eos>": self.tokenizer.eos_id,
-            "<pad>": self.tokenizer.pad_id
+            "<pad>": self.tokenizer.pad_id,
         }
 
     def get_command(self, token):
@@ -108,7 +109,7 @@ class ChatGLMTokenizer(PreTrainedTokenizer):
         return self.tokenizer.n_words
 
     def get_vocab(self):
-        """ Returns vocab as a dict """
+        """Returns vocab as a dict"""
         vocab = {self._convert_id_to_token(i): i for i in range(self.vocab_size)}
         vocab.update(self.added_tokens_encoder)
         return vocab
@@ -117,7 +118,7 @@ class ChatGLMTokenizer(PreTrainedTokenizer):
         return self.tokenizer.tokenize(text)
 
     def _convert_token_to_id(self, token):
-        """ Converts a token (str) in an id using the vocab. """
+        """Converts a token (str) in an id using the vocab."""
         return self.tokenizer.convert_token_to_id(token)
 
     def _convert_id_to_token(self, index):
@@ -141,13 +142,11 @@ class ChatGLMTokenizer(PreTrainedTokenizer):
             `Tuple(str)`: Paths to the files saved.
         """
         if os.path.isdir(save_directory):
-            vocab_file = os.path.join(
-                save_directory, self.vocab_files_names["vocab_file"]
-            )
+            vocab_file = os.path.join(save_directory, self.vocab_files_names["vocab_file"])
         else:
             vocab_file = save_directory
 
-        with open(self.vocab_file, 'rb') as fin:
+        with open(self.vocab_file, "rb") as fin:
             proto_str = fin.read()
 
         with open(vocab_file, "wb") as writer:
@@ -169,7 +168,7 @@ class ChatGLMTokenizer(PreTrainedTokenizer):
         return prompt
 
     def build_inputs_with_special_tokens(
-            self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
+        self, token_ids_0: List[int], token_ids_1: Optional[List[int]] = None
     ) -> List[int]:
         """
         Build model inputs from a sequence or a pair of sequence for sequence classification tasks by concatenating and
@@ -194,12 +193,12 @@ class ChatGLMTokenizer(PreTrainedTokenizer):
         return token_ids_0
 
     def _pad(
-            self,
-            encoded_inputs: Union[Dict[str, EncodedInput], BatchEncoding],
-            max_length: Optional[int] = None,
-            padding_strategy: PaddingStrategy = PaddingStrategy.DO_NOT_PAD,
-            pad_to_multiple_of: Optional[int] = None,
-            return_attention_mask: Optional[bool] = None,
+        self,
+        encoded_inputs: Union[Dict[str, EncodedInput], BatchEncoding],
+        max_length: Optional[int] = None,
+        padding_strategy: PaddingStrategy = PaddingStrategy.DO_NOT_PAD,
+        pad_to_multiple_of: Optional[int] = None,
+        return_attention_mask: Optional[bool] = None,
     ) -> dict:
         """
         Pad encoded inputs (on left/right and up to predefined length or max length in the batch)

@@ -1,19 +1,20 @@
 import json
+
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
+from tqdm import tqdm
 
 
 def sft_process():
-    with open('./sft_data/alpaca_gpt4_data_zh.json', 'r', encoding='utf-8') as f:
+    with open("./sft_data/alpaca_gpt4_data_zh.json", "r", encoding="utf-8") as f:
         data = json.load(f)
     #
     q_lst = []
     a_lst = []
     for per in data:
-        q = per['instruction']
-        i = per['input']
-        a = per['output']
+        q = per["instruction"]
+        i = per["input"]
+        a = per["output"]
         q = q + i
         if len(q) < 10 or len(a) < 5:
             continue
@@ -22,7 +23,7 @@ def sft_process():
         q_lst.append(q)
         a_lst.append(a)
 
-    f = open('./sft_data/Belle_open_source_1M.json', 'r', encoding='utf-8')
+    f = open("./sft_data/Belle_open_source_1M.json", "r", encoding="utf-8")
 
     # s
     while True:
@@ -30,9 +31,9 @@ def sft_process():
         if not line:
             break
         per = json.loads(line)
-        q = per['instruction']
-        i = per['input']
-        a = per['output']
+        q = per["instruction"]
+        i = per["input"]
+        a = per["output"]
         q = q + i
         if len(q) < 10 or len(a) < 5:
             continue
@@ -40,12 +41,14 @@ def sft_process():
             continue
         q_lst.append(q)
         a_lst.append(a)
-    df = pd.DataFrame(columns=['prompt', 'answer'])
-    df['prompt'] = q_lst
-    df['answer'] = a_lst
-    df.to_csv('sft_data/sft_data.csv', index=False)
+    df = pd.DataFrame(columns=["prompt", "answer"])
+    df["prompt"] = q_lst
+    df["answer"] = a_lst
+    df.to_csv("sft_data/sft_data.csv", index=False)
     print(df)
 
-save_dir = './sft_data'
-if not os.path.exists(save_dir): os.makedirs(save_dir)
+
+save_dir = "./sft_data"
+if not os.path.exists(save_dir):
+    os.makedirs(save_dir)
 sft_process()
