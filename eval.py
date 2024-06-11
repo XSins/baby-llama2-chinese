@@ -2,11 +2,8 @@
 Sample from the trained model with PyTorch
 """
 
-import json
-import os
 from contextlib import nullcontext
 
-import numpy as np
 import torch
 
 from chatglm_tokenizer.tokenization_chatglm import ChatGLMTokenizer

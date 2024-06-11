@@ -4,18 +4,14 @@ import platform
 import re
 from collections import Counter, defaultdict
 from dataclasses import field, make_dataclass
-from typing import Union
 
-import jieba
 import numpy as np
-import pandas as pd
 import torch
 import ujson
 from datasketch import MinHash, MinHashLSH
-from nltk import ngrams
 from nltk.translate.bleu_score import sentence_bleu
 from simhash import Simhash, SimhashIndex
-from transformers import T5Config, TrainerCallback, TrainingArguments
+from transformers import TrainerCallback, TrainingArguments
 from transformers.trainer_callback import TrainerControl, TrainerState
 
 # 结束标点符号

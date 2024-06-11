@@ -1,9 +1,6 @@
-import random
-
 import numpy as np
 import pandas as pd
 import torch
-from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, Dataset
 
 from chatglm_tokenizer.tokenization_chatglm import ChatGLMTokenizer

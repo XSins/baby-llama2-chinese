@@ -1,11 +1,10 @@
 import os
 from typing import Dict, List, Optional, Union
 
-import torch
 from sentencepiece import SentencePieceProcessor
 from transformers import PreTrainedTokenizer
 from transformers.tokenization_utils_base import BatchEncoding, EncodedInput
-from transformers.utils import PaddingStrategy, logging
+from transformers.utils import PaddingStrategy
 
 
 class SPTokenizer:

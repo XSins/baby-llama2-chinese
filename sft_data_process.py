@@ -1,6 +1,6 @@
 import json
+import os
 
-import numpy as np
 import pandas as pd
 from tqdm import tqdm
 
@@ -11,7 +11,7 @@ def sft_process():
     #
     q_lst = []
     a_lst = []
-    for per in data:
+    for per in tqdm(data, desc="sft_process", total=len(data)):
         q = per["instruction"]
         i = per["input"]
         a = per["output"]

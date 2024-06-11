@@ -1,7 +1,6 @@
 import logging
 import os
 import time
-from os.path import abspath, dirname
 
 import colorlog
 

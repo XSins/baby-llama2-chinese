@@ -1,10 +1,8 @@
 import os
 
 os.environ["CUDA_VISIBLE_DEVICES"] = "0"
-import json
 import logging
 import math
-import pickle
 import time
 from contextlib import nullcontext
 
@@ -107,7 +105,7 @@ def train_epoch(epoch):
 
 # ------------------
 @torch.no_grad()
-def valid_epoch(epoch):
+def valid_epoch(epoch, val_loader):
     global best_val_loss
     losses = []
     model.eval()
@@ -216,7 +214,6 @@ if __name__ == "__main__":
     # exec(open("configurator.py").read())  # overrides from command line or config file
     # config = {k: globals()[k] for k in config_keys}  # will be useful for logging
     # -----------------------------------------------------------------------------
-
     save_dir = os.path.join(out_dir, "sft")
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
@@ -248,7 +245,6 @@ if __name__ == "__main__":
         print(
             f"breaks down as: {gradient_accumulation_steps} grad accum steps * {ddp_world_size} processes * {batch_size} batch size * {max_seq_len} max seq len"
         )
-
     if master_process:
         os.makedirs(out_dir, exist_ok=True)
     torch.manual_seed(1337 + seed_offset)
@@ -260,7 +256,6 @@ if __name__ == "__main__":
     ctx = nullcontext() if device_type == "cpu" else torch.cuda.amp.autocast()
     #
     best_val_loss = 1e9
-
     # -----init dataloader------
     df = pd.read_csv("./sft_data/sft_data.csv")
     # input=[]

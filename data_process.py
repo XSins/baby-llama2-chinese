@@ -2,7 +2,6 @@ import glob
 import json
 
 import numpy as np
-import pandas as pd
 from tqdm import tqdm
 
 from chatglm_tokenizer.tokenization_chatglm import ChatGLMTokenizer

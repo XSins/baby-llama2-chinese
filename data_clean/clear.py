@@ -1,21 +1,14 @@
-import codecs
-import csv
 import re
 import sys
 import time
-from collections import defaultdict
-from os import mkdir, remove, walk
-from os.path import abspath, dirname, exists, isdir
+from os import remove
+from os.path import exists
 
-import numpy as np
 import pandas as pd
 import pyarrow.parquet as pq
 import ujson
-from fastparquet import ParquetFile, write
-from matplotlib import pyplot as plt
+from fastparquet import write
 from rich import progress
-from rich.console import Console
-from rich.table import Table
 
 sys.path.extend([".", ".."])
 
@@ -51,7 +44,7 @@ def remove_duplicate_punctuation(sentence: str) -> str:
     """
     删除句子中重复的标点符号、重复的空格，同时将换行变为特殊字符'\n'
     """
-    # 将空格（全角空格）替换为逗号, 可能会有重复的空客，下面删除重复标点会删除
+    # 将空格（全角空格）替换为逗号, 可能会有重复的空格，下面删除重复标点会删除
     sentence = re.sub(" |　", "，", sentence)
 
     ans = ""
