@@ -48,7 +48,12 @@ def sft_process():
     print(df)
 
 
-save_dir = "./sft_data"
-if not os.path.exists(save_dir):
-    os.makedirs(save_dir)
-sft_process()
+def main():
+    save_dir = "./sft_data"
+    if not os.path.exists(save_dir):
+        os.makedirs(save_dir)
+    sft_process()
+
+
+if __name__ == "__main__":
+    main()
