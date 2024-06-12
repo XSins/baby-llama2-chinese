@@ -1,58 +1,57 @@
 import json
-import os
+from pathlib import Path
+from typing import Generator
 
 import pandas as pd
-from tqdm import tqdm
 
 
-def sft_process():
-    with open("./sft_data/alpaca_gpt4_data_zh.json", "r", encoding="utf-8") as f:
-        data = json.load(f)
-    #
-    q_lst = []
-    a_lst = []
-    for per in tqdm(data, desc="sft_process", total=len(data)):
-        q = per["instruction"]
-        i = per["input"]
+def json_lines_reader(file_path: Path | str) -> Generator[dict[str, str], None, None]:
+    with open(file_path, "r", encoding="utf-8") as f:
+        for line in f:
+            yield json.loads(line)
+
+
+def filter_and_yield(data_generator: Generator[dict[str, str], None, None], min_q_len=10, min_a_len=5, max_len=256):
+    for per in data_generator:
+        q = per["instruction"] + (per.get("input", "") or "")
         a = per["output"]
-        q = q + i
-        if len(q) < 10 or len(a) < 5:
-            continue
-        if len(q) > 256 or len(a) > 256:
-            continue
-        q_lst.append(q)
-        a_lst.append(a)
+        if min_q_len <= len(q) <= max_len and min_a_len <= len(a) <= max_len:
+            yield {"prompt": q, "answer": a}
 
-    f = open("./sft_data/Belle_open_source_1M.json", "r", encoding="utf-8")
 
-    # s
-    while True:
-        line = f.readline()
-        if not line:
-            break
-        per = json.loads(line)
-        q = per["instruction"]
-        i = per["input"]
-        a = per["output"]
-        q = q + i
-        if len(q) < 10 or len(a) < 5:
-            continue
-        if len(q) > 256 or len(a) > 256:
-            continue
-        q_lst.append(q)
-        a_lst.append(a)
-    df = pd.DataFrame(columns=["prompt", "answer"])
-    df["prompt"] = q_lst
-    df["answer"] = a_lst
-    df.to_csv("sft_data/sft_data.csv", index=False)
-    print(df)
+def batch_process_to_csv(
+    input_files: list[Path | str] | Generator[Path | str, None, None], output_file: Path | str, batch_size=10000
+):
+    chunks = []
+    total_written = 0
+
+    for file_path in input_files:
+        print(f"Processing {file_path}...")
+        data_gen = json_lines_reader(file_path)
+        filtered_gen = filter_and_yield(data_gen)
+
+        for i, item in enumerate(filtered_gen):
+            chunks.append(item)
+            if len(chunks) >= batch_size:
+                df_chunk = pd.DataFrame(chunks)
+                df_chunk.to_csv(output_file, mode="a", header=not total_written, index=False)
+                chunks.clear()
+                total_written += len(df_chunk)
+                print(f"{total_written} items processed.")
+
+    if chunks:
+        df_chunk = pd.DataFrame(chunks)
+        df_chunk.to_csv(output_file, mode="a", header=False, index=False)
+        total_written += len(df_chunk)
+        print(f"All done. Total {total_written} items written to {output_file}.")
 
 
 def main():
-    save_dir = "./sft_data"
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
-    sft_process()
+    data_dir = Path("./sft_data").resolve()
+    data_dir.mkdir(exist_ok=True)
+    raw_data_files = (data_dir / "raw").rglob("*.jsonl")
+    output_csv = data_dir / "sft_data.csv"
+    batch_process_to_csv(raw_data_files, output_csv)
 
 
 if __name__ == "__main__":
