@@ -257,7 +257,7 @@ if __name__ == "__main__":
     #
     best_val_loss = 1e9
     # -----init dataloader------
-    df = pd.read_csv("./sft_data/sft_data.csv")
+    df = pd.read_parquet("./sft_data/sft_data.parquet", engine="pyarrow")
     # input=[]
     # target=[]
     # with open('../track1/train_valid.json','r') as f:
